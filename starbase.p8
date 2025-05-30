@@ -5,18 +5,18 @@ __lua__
 -- by hugh :)
 
 function _init()
-	tsz=8 -- tile size
-	cx=7 cy=7 --player reticle
+	tsz=8 --tile size
+	cx=7*tsz cy=7*tsz --reticle
 	nodes={}
 	
-	node.create(8,8,true)
+	node.create(8*tsz+1,8*tsz+1,true)
 end
 
 function _update()
- if btnp(➡️) then cx+=1 end
- if btnp(⬅️) then cx-=1 end
-	if btnp(⬇️) then cy+=1 end
-	if btnp(⬆️) then cy-=1 end
+ if btn(➡️) then cx+=1 end
+ if btn(⬅️) then cx-=1 end
+	if btn(⬇️) then cy+=1 end
+	if btn(⬆️) then cy-=1 end
  if btnp(❎) then
   node.create(cx,cy)
  end
@@ -27,8 +27,8 @@ end
 
 function _draw()
  cls(1)
-	rect(cx*tsz,cy*tsz,
-						cx*tsz+(tsz+1),cy*tsz+(tsz+1),7)
+	rect(cx,cy,
+						cx+tsz+1,cy+tsz+1,7)
 	for n in all(nodes) do
 		node.draw(n)
 	end
@@ -50,7 +50,7 @@ node.update=function(n)
 end
 
 node.draw=function(n)
- spr(n.sp, (n.x*tsz)+1, (n.y*tsz)+1)
+ spr(n.sp,n.x,n.y)
 end
 
 --todo: nodes as lookup table?
