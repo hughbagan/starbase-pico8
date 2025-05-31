@@ -33,13 +33,6 @@ function _draw()
 						cx+tsz+1,cy+tsz+1,7)
 	for i=1,#nodes do
 	 node.draw(nodes[i])
-	 for j=i,#nodes do
-	  if node.near(nodes[i],nodes[j],40) then
-	  	line(nodes[i].x,nodes[i].y,
-	  	     nodes[j].x,nodes[j].y,
-	  	     6)
-	  end
-	 end
 	end
 end
 
@@ -51,10 +44,28 @@ end
 
 node={}
 
+nid=0
+
 node.create=function(_x,_y,_p)
  if _p==nil then _p=false end
-	local n={x=_x,y=_y,sp=1,pwr=_p}
+	local n={id=nid,
+	 x=_x,y=_y,sp=1,pwr=_p,
+		ctr={x=_x+tsz/2,y=_y+tsz/2},
+		nbr={}
+	}
+	--detect neighbours
+	--todo: register closest first
+	for i=1,#nodes do
+	 if node.near(n,nodes[i],40) then
+	  if #n.nbr<4 and #nodes[i].nbr<4 then
+	   add(n.nbr, nodes[i])
+	   add(nodes[i].nbr, n)
+	  end
+	 end
+	end
 	add(nodes,n)
+	nid+=1
+	--todo: handle nid overflow
 end
 
 node.update=function(n)
@@ -62,7 +73,14 @@ node.update=function(n)
 end
 
 node.draw=function(n)
- spr(n.sp,n.x,n.y)
+ for n2 in all(n.nbr) do
+  if n.id<n2.id then
+   line(n.ctr.x,n.ctr.y,
+        n2.ctr.x,n2.ctr.y,
+ 	   	  6) 
+ 	end
+ end
+ spr(n.sp,n.x,n.y) --on top 
 end
 
 node.empty=function(_x,_y)
@@ -82,10 +100,8 @@ node.near=function(n1,n2,d)
 	   and (dx^2+dy^2)<d^2
 end
 
---todo: centre node line coords
---      and elaborate line draw
---todo: nodes as lookup table?
---don't want to always iterate
+--todo: power nodes based on
+--      neighbours
 -- also wtf is local again?
 
 -->8
