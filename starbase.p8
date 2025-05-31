@@ -60,6 +60,12 @@ node.create=function(_x,_y,_p)
 	  if #n.nbr<4 and #nodes[i].nbr<4 then
 	   add(n.nbr, nodes[i])
 	   add(nodes[i].nbr, n)
+	   if n.pwr then
+	    nodes[i].pwr=true
+	   end
+	   if nodes[i].pwr then
+	    n.pwr=true
+	   end
 	  end
 	 end
 	end
@@ -77,7 +83,8 @@ node.draw=function(n)
   if n.id<n2.id then
    line(n.ctr.x,n.ctr.y,
         n2.ctr.x,n2.ctr.y,
- 	   	  6) 
+ 	   	  (n.pwr and n2.pwr)
+ 	   	   and 10 or 6) 
  	end
  end
  spr(n.sp,n.x,n.y) --on top 
@@ -100,8 +107,6 @@ node.near=function(n1,n2,d)
 	   and (dx^2+dy^2)<d^2
 end
 
---todo: power nodes based on
---      neighbours
 -- also wtf is local again?
 
 -->8
