@@ -6,24 +6,29 @@ __lua__
 
 function _init()
 	tsz=8 --tile size
-	cx=7*tsz cy=7*tsz --reticle
+	--player control
+	c={x=7*tsz,y=7*tsz,ctr={x,y}}
+	c.ctr=centre(c.x,c.y)
+
 	nodes={}
 	
 	node.create(8*tsz+1,8*tsz+1,true)
 end
 
 function _update()
- if btn(➡️) then cx+=1 end
- if btn(⬅️) then cx-=1 end
-	if btn(⬇️) then cy+=1 end
-	if btn(⬆️) then cy-=1 end
+ if btn(➡️) then c.x+=1 end
+ if btn(⬅️) then c.x-=1 end
+	if btn(⬇️) then c.y+=1 end
+	if btn(⬆️) then c.y-=1 end
+	c.ctr=centre(c.x,c.y)
+	
  if btnp(❎) then
-  if not node.get(cx+1,cy+1) then
-	  node.create(cx+1,cy+1)
+  if not node.get(c.x+1,c.y+1) then
+	  node.create(c.x+1,c.y+1)
 	 end
  end
  if btnp(🅾️) then
-  n=node.get(cx+1,cy+1)
+  n=node.get(c.x+1,c.y+1)
   if n then node.destroy(n) end
  end
  for n in all(nodes) do
@@ -33,10 +38,17 @@ end
 
 function _draw()
  cls(1)
-	rect(cx,cy,
-						cx+tsz+1,cy+tsz+1,7)
+ spr(1,c.x+1,c.y+1)
+	rect(c.x,c.y,
+						c.x+tsz+1,c.y+tsz+1,7)
+	--circ((c.x+tsz/2)+1,(c.y+tsz/2)+1,rad-3,7)
 	for i=1,#nodes do
 	 node.draw(nodes[i])
+	 if node.near(c,nodes[i],rad+1) then
+	  line(c.ctr.x,c.ctr.y,nodes[i].ctr.x,nodes[i].ctr.y,11)
+	 elseif node.near(c,nodes[i],rad+5) then
+	  line(c.ctr.x,c.ctr.y,nodes[i].ctr.x,nodes[i].ctr.y,8)
+	 end
 	end
 end
 
@@ -49,21 +61,24 @@ end
 node={}
 
 nid=0
+rad=20
 
 node.create=function(_x,_y,_p)
  if _p==nil then _p=false end
 	local n={id=nid,
 	 x=_x,y=_y,sp=1,pwr=_p,
-		ctr={x=_x+tsz/2,y=_y+tsz/2},
+		ctr=centre(_x,_y),
 		nbr={}
 	}
 	--detect neighbours
 	--todo: register closest first
 	for i=1,#nodes do
-	 if node.near(n,nodes[i],40) then
+	 if node.near(n,nodes[i],rad) then
 	  if #n.nbr<4 and #nodes[i].nbr<4 then
+	   --set pointers
 	   add(n.nbr, nodes[i])
 	   add(nodes[i].nbr, n)
+	   --todo: set pwr in update()
 	   if n.pwr then
 	    nodes[i].pwr=true
 	   end
@@ -117,8 +132,8 @@ node.get=function(_x,_y)
 end
 
 node.near=function(n1,n2,d)
-	local dx=abs(n2.x-n1.x)
-	local dy=abs(n2.y-n1.y)
+	local dx=abs(n2.ctr.x-n1.ctr.x)
+	local dy=abs(n2.ctr.y-n1.ctr.y)
 	return dx<d
 	   and dy<d
 	   and (dx^2+dy^2)<d^2
@@ -134,6 +149,13 @@ function overlap(a,b)
 	   and a.x+tsz>b.x
 	   and a.y<b.y+tsz
 	   and a.y+tsz>b.y
+end
+
+function centre(_x,_y)
+ local ctr={}
+ ctr.x=_x+tsz/2
+ ctr.y=_y+tsz/2
+ return ctr
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
