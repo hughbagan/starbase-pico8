@@ -44,6 +44,8 @@ function _draw()
 	--circ((c.x+tsz/2)+1,(c.y+tsz/2)+1,rad-3,7)
 	for i=1,#nodes do
 	 node.draw(nodes[i])
+	 --todo: account for <5 nbr
+	 --      in line preview
 	 if node.near(c,nodes[i],rad+1) then
 	  line(c.ctr.x,c.ctr.y,nodes[i].ctr.x,nodes[i].ctr.y,11)
 	 elseif node.near(c,nodes[i],rad+5) then
@@ -73,12 +75,11 @@ node.create=function(_x,_y,_p)
 	--detect neighbours
 	--todo: register closest first
 	for i=1,#nodes do
-	 if node.near(n,nodes[i],rad) then
+	 if node.near(n,nodes[i],rad+1) then
 	  if #n.nbr<4 and #nodes[i].nbr<4 then
 	   --set pointers
 	   add(n.nbr, nodes[i])
 	   add(nodes[i].nbr, n)
-	   --todo: set pwr in update()
 	   if n.pwr then
 	    nodes[i].pwr=true
 	   end
@@ -139,6 +140,8 @@ node.near=function(n1,n2,d)
 	   and (dx^2+dy^2)<d^2
 end
 
+--todo: new node type
+--      shooter? miner?
 -- also wtf is local again?
 
 -->8
