@@ -18,9 +18,13 @@ function _update()
 	if btn(⬇️) then cy+=1 end
 	if btn(⬆️) then cy-=1 end
  if btnp(❎) then
-  if node.empty(cx+1,cy+1) then
+  if not node.get(cx+1,cy+1) then
 	  node.create(cx+1,cy+1)
 	 end
+ end
+ if btnp(🅾️) then
+  n=node.get(cx+1,cy+1)
+  if n then node.destroy(n) end
  end
  for n in all(nodes) do
  	node.update(n)
@@ -70,8 +74,21 @@ node.create=function(_x,_y,_p)
 	 end
 	end
 	add(nodes,n)
-	nid+=1
-	--todo: handle nid overflow
+	nid+=1 --todo: fix overflow
+end
+
+node.destroy=function(n)
+ for i=1,#nodes do
+ 	if nodes[i].id==n.id then
+ 	 --unlink neighbours
+ 	 for n2 in all(nodes[i].nbr) do
+ 	  del(n2.nbr,nodes[i])
+ 	 end
+ 	 deli(nodes,i)
+ 	 return true
+ 	end
+ end
+ return false
 end
 
 node.update=function(n)
@@ -90,13 +107,13 @@ node.draw=function(n)
  spr(n.sp,n.x,n.y) --on top 
 end
 
-node.empty=function(_x,_y)
+node.get=function(_x,_y)
 	for n in all(nodes) do
 		if overlap(n,{x=_x,y=_y}) then
-			return false
+			return n
 		end
 	end
-	return true
+	return nil
 end
 
 node.near=function(n1,n2,d)
