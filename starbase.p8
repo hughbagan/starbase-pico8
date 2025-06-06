@@ -6,7 +6,7 @@ __lua__
 
 
 --todo: node selection ui
-
+--todo: scroll camera/level
 --todo: fix pwr algo
 
 --also wtf is local again?
@@ -47,7 +47,7 @@ function _update()
 end
 
 function _draw()
- cls(1)
+ cls(0)
  spr(1,c.x+1,c.y+1)
 	rect(c.x,c.y,
 						c.x+tsz+1,c.y+tsz+1,7)
@@ -59,7 +59,7 @@ function _draw()
  	 node.draw(nodes[i])
  	end
 	 
-	 --create nbr prediction
+	 --neighbour preview
 	 if #nodes[i].nbr<4 then
  	 if node.near(c,nodes[i],rad+1) then
 	   line(c.ctr.x,c.ctr.y,nodes[i].ctr.x,nodes[i].ctr.y,11)
